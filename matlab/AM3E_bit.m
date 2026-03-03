@@ -83,4 +83,5 @@ plot(Fs/L*(-L/2:L/2-1),abs(fftshift(z)),"LineWidth",3)
 title("Спектр БПФ на положительных и отрицательных частотах")
 xlabel("f (Гц)")
 ylabel("|fft(X)|")
+
 %}
