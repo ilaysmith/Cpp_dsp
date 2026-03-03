@@ -40,3 +40,4 @@ z = audio / max(abs(audio));
 %% Запись файла
 audiowrite('C:\Users\morda\Desktop\Signals\Task\new_F3E_IQW.wav',z , Fs);
 
+
