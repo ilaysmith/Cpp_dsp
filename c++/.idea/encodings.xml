@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Encoding">
+    <file url="file://$PROJECT_DIR$/dsp_my/Class_declarations.h" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/dsp_my/Complex.h" charset="UTF-16" />
+    <file url="file://$PROJECT_DIR$/dsp_my/Demodulator.h" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/dsp_my/Factory.h" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/dsp_my/FileManager.h" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/dsp_my/Signal.h" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/dsp_my/demodulator.cpp" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/dsp_my/downsample.cpp" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/dsp_my/filter.cpp" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/dsp_my/load_bin_and_data.cpp" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/dsp_my/load_wav_and_iqw.cpp" charset="ISO-8859-1" />
+    <file url="file://$PROJECT_DIR$/dsp_my/save_bin_and_dat.cpp" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/dsp_my/save_wav_and_iqw.cpp" charset="UTF-8" />
+    <file url="PROJECT" charset="UTF-8" />
+  </component>
+</project>
