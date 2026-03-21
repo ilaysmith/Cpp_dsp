@@ -4,15 +4,15 @@
 #include <fstream> // Для работы с файлом
 
 
-void save_bin_and_data(const Signal &signal, const std::string &filename) {
+void save_bin_and_data(const std::vector<float> &signal, const std::string &filename) {
     std::ofstream file(filename, std::ios::binary); // Открыть файл на запись файла
 
-    for (size_t i = 0; i < signal.signal.size(); i++) {
-        float re = signal.signal[i].get_real(); // Сохраняем I-компоненты
-        float im = signal.signal[i].get_imag(); // Сохраняем Q-компоненты
+    for (size_t i = 0; i < signal.size(); i += 2) {
+        //float re = signal.signal[i].get_real(); // Сохраняем I-компоненты
+        //float im = signal.signal[i].get_imag(); // Сохраняем Q-компоненты
 
-        file.write(reinterpret_cast<const char *>(&re), sizeof(float)); // **1 + **2
-        file.write(reinterpret_cast<const char *>(&im), sizeof(float)); // **1 + **2
+        file.write(reinterpret_cast<const char *>(&signal[i]), sizeof(float)); // **1 + **2
+        file.write(reinterpret_cast<const char *>(&signal[i + 1]), sizeof(float)); // **1 + **2
     }
     file.close(); // Закрыть файл
 }

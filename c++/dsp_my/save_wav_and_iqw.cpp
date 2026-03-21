@@ -1,17 +1,22 @@
 #include "Signal.h"
 #include "AudioFile.h" // Для работы с wav и iqw
 
-void save_wav_and_iqw(const Signal &saveSignal, AudioFile<float> audioFile, const std::string &fileName) {
+void save_wav_and_iqw(const std::vector<float> &saveSignal, AudioFile<float> audioFile, const std::string &fileName) {
 
-    audioFile.setSampleRate(int(saveSignal.fs)); // Получаем ЧД
+    //audioFile.setSampleRate(int(saveSignal.fs)); // Получаем ЧД
+
     audioFile.setBitDepth(32); // Получаем сколько бит на 1 отсчёт + **1
 
-    size_t numSamples = saveSignal.signal.size(); // Количество комплексных отсчётов в сигнале saveSignal.signal
+    //size_t numSamples = saveSignal.signal.size(); // Количество комплексных отсчётов в сигнале saveSignal.signal
+    size_t numSamples = saveSignal.size();
+    audioFile.setSampleRate(24100);           // Частота дискретизации
     audioFile.setAudioBufferSize(2, numSamples); // Выделяем память для аудиобуфера + **2
 
-    for (size_t i = 0; i < numSamples; ++i) {
-        audioFile.samples[0][i] = saveSignal.signal[i].get_real(); // Первый канал I (массив)
-        audioFile.samples[1][i] = saveSignal.signal[i].get_imag(); // Второй канал Q (массив)
+    for (size_t i = 0; i < numSamples; i += 2) {
+        //audioFile.samples[0][i] = saveSignal.signal[i].get_real(); // Первый канал I (массив)
+        //audioFile.samples[1][i] = saveSignal.signal[i].get_imag(); // Второй канал Q (массив)
+        audioFile.samples[0][i] = saveSignal[i];
+        audioFile.samples[1][i] = saveSignal[i + 1];
     }
     audioFile.save(fileName, AudioFileFormat::Wave);
 }

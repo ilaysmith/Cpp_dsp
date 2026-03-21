@@ -1,6 +1,6 @@
 clear all; close all; clc;
 %% Чтение файла
-fid = fopen('C:\Users\morda\Desktop\Signals\Task\FM3E_fs_24000_float_12_16_56.bin');
+fid = fopen('/home/morda/task_for_stc_1/dsp_my/dsp_my/FM3E_fs_24000_float_12_16_56.bin');
 y = fread(fid,inf,"single");
 fclose(fid);
 Fs = 24000;
@@ -36,10 +36,12 @@ end
 % не требуется, потому что её нет
 
 %% Нормируем
+mpi = pi;
+max11 =  abs(max(audio));
 z_norm = audio / abs(max(audio));
 
 %% Запись 
-audiowrite('C:\Users\morda\Desktop\Signals\Task\new_FM3E_bin.wav',z_norm,Fs);
+audiowrite('/home/morda/task_for_stc_1/dsp_my/dsp_my/FM3E_bin.wav',z_norm,Fs);
 
 %% Сформируем I и Q обратно
 %II = real(z_norm(1:1:end));

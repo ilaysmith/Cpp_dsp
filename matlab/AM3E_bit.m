@@ -2,7 +2,7 @@ clear all; close all; clc;
 
 %% Чтение файла 
 % Содержит просто данные: читаем через fread 
-fid = fopen('C:\Users\morda\Desktop\Signals\Task\AM3E_fs_24000_float_10_43_02.bin');
+fid = fopen('/home/morda/task_for_stc_1/dsp_my/dsp_my/AM3E_fs_24000_float_10_43_02.bin');
 y = fread(fid, inf, 'single'); % в матлаб аналог float это single 
 Fs = 24000; % задана в названии
 % получили отсчёты комплексного сигнала
@@ -23,7 +23,8 @@ final = z / max(abs(z)); % чтобы при записи данные не бы
 % обрезаны.
 
 %% Запись сигнала
-audiowrite('C:\Users\morda\Desktop\Signals\Task\new_AM3E_bin.wav',final,Fs);
+audiowrite('/home/morda/task_for_stc_1/Cpp_dsp/sound/MATLAB_AM_BIN_TEST.wav',final,Fs);
+
 
 %% Доп
 

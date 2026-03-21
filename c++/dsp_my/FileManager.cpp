@@ -5,7 +5,7 @@
 #include "any_function.h" // Необходимая библиотека для чтения wav и iqw
 #include "Class_declarations.h"
 
-void FileManager::SaveSignal(const Signal &saveSignal, const std::string &fileName, Format format) {
+void FileManager::SaveSignal(const std::vector<float> &saveSignal, const std::string &fileName, Format format) {
 
     AudioFile<float> audioFile;
 
@@ -50,12 +50,12 @@ Signal FileManager::loadSignal(const std::string &filename, Format format) {
 
         case Format::wav:
 
-            signal = load_wav_and_iqw();    // Функция извлечения байт из файла расширения .wav
+            signal = load_wav_and_iqw(filename, signal);    // Функция извлечения байт из файла расширения .wav
             break;
 
         case Format::iqw:
 
-            signal = load_wav_and_iqw();    // Функция извлечения байт из файла расширения .iqw
+            signal = load_wav_and_iqw(filename, signal);    // Функция извлечения байт из файла расширения .iqw
             break;
 
         case Format::unknown:

@@ -4,7 +4,7 @@ clear all; close all; clc;
 
 %% Чтение файла
 % Придётся прочесть таким образом. Однако не известен тип данных
-fid = fopen('C:\Users\morda\Desktop\Signals\Task\am_sound (1).dat');
+fid = fopen('/home/morda/task_for_stc_1/Cpp_dsp/sound/am_sound (1).dat');
 y = fread(fid, inf, 'int32');  % Читаем как int32
 fclose(fid);
 Fs = 13000; % Исходя из "Дано" 32000. Или 16000 Гц. Подбором получилось оптимальное значение 13000
@@ -29,5 +29,5 @@ final = z / abs(max(z)); % чтобы при записи данные не бы
 % применением большего значения windowSize.
 
 %% Запись сигнала
-audiowrite('C:\Users\morda\Desktop\Signals\Task\new_am_sound_dat.wav',final,Fs);
+audiowrite('/home/morda/task_for_stc_1/Cpp_dsp/sound/MATLBam_sound.wav',final,Fs);
 

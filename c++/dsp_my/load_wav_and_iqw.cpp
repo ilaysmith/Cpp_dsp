@@ -2,10 +2,11 @@
 #include "Signal.h"
 #include "AudioFile.h" // Для работы с wav и iqw
 
-Signal load_wav_and_iqw() {
+Signal load_wav_and_iqw(const std::string &fileName, Signal &signal) {
 
-    Signal signal;
+    //Signal signal;
     AudioFile<float> audioFile;
+    audioFile.load(fileName);
 
     signal.fs = audioFile.getSampleRate(); // Получим ЧД
 

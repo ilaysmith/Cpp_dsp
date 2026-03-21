@@ -7,12 +7,14 @@
 int main() {
 
     //Signal signal;
-    std::string fileName = "/home/morda/task_for_stc_1/dsp_my/dsp_my/AM3E_fs_24000_float_10_43_02.bin";
-    int Fs = 24000; // Из названия
-    Format format = Format::bin; // Из названия
+    std::string fileName = "/home/morda/task_for_stc_1/Cpp_dsp/sound/am_sound (1).dat";
+    // /home/morda/task_for_stc_1/dsp_my/dsp_my/AM3E_fs_24000_float_10_43_02.bin
+    // /home/morda/task_for_stc_1/dsp_my/dsp_my/FM3E_fs_24000_float_12_16_56.bin"
+    int Fs = 13000; // Из названия. Вообще 24000. Для dat 13000
+    Format format = Format::dat; // Из названия
 
     FileManager fileManager; // Объект класса файлового менеджера
-    Signal signal;
+    Signal signal(Fs);
     // Вызов метода получения данных из файла - Complex IQ. Тип данных float
     signal = fileManager.loadSignal(fileName, format);
 
@@ -20,11 +22,12 @@ int main() {
     Factory factory;
     Demodulator *demod = factory.create("AM", Fs);
 
-    Signal result = demod->getDemodulatedSignal(signal); // Вызовется DemodulatorAM::getDemodulatedSignal
+    std::vector<float> result = demod->getDemodulatedSignal(signal); // Вызовется DemodulatorAM::getDemodulatedSignal
 
     // Сохраним
     std::string new_file_name = "/home/morda/task_for_stc_1/dsp_my/dsp_my/AM3E_cpp.bin";
-    fileManager.SaveSignal(result, new_file_name, Format::bin);
+
+    fileManager.SaveSignal(result, new_file_name, Format::dat);
     delete demod; // Возможна утечка памяти, если не вызвать delete (ранее был new)
 
 

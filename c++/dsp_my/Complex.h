@@ -61,6 +61,13 @@ public:
         return Complex<T>(real_ * scalar, imag_ * scalar);
     }
 
+    Complex<T> operator+=(const Complex<T> &other) {
+        real_ += other.real_;
+        imag_ += other.imag_;
+        return *this; // Возвращает ссылку на текущий объект
+    }
+
+
 };
 
 #endif 

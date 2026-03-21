@@ -19,7 +19,7 @@ public:
 
     Signal loadSignal(const std::string &filename, Format format);
 
-    void SaveSignal(const Signal &savedSignal, const std::string &fileName, Format format);
+    void SaveSignal(const std::vector<float> &savedSignal, const std::string &fileName, Format format);
 
 };
 
@@ -37,6 +37,8 @@ public:
     }
 
     std::vector<float> delete_const(std::vector<float> &data); // Метод удаления постоянной составляющей для АМ
+
+    std::vector<float> delete_const_complex(Signal &signal); // Метод удаления постоянной составляющей для SSB
 };
 
 
@@ -49,7 +51,8 @@ public:
 
     virtual ~Demodulator() = default;
 
-    virtual Signal getDemodulatedSignal(Signal signal) = 0; // указываем чистую виртуальную функцию + **1
+    // сделать return vector<float> для АМ и Signal для FM
+    virtual std::vector<float> getDemodulatedSignal(Signal signal) = 0; // указываем чистую виртуальную функцию + **1
 
 
 };
@@ -59,7 +62,7 @@ class DemodulatorAM : public Demodulator {
 public:
     DemodulatorAM(int fs) : Demodulator(fs) {};
 
-    Signal getDemodulatedSignal(Signal signal) override; // + **2
+    std::vector<float> getDemodulatedSignal(Signal signal) override; // + **2
 };
 
 // 5. Производный класс для FM сигнала.
@@ -67,10 +70,27 @@ class DemodulatorFM : public Demodulator {
 public:
     DemodulatorFM(int fs) : Demodulator(fs) {};
 
-    Signal getDemodulatedSignal(Signal signal) override; // + **2
+    std::vector<float> getDemodulatedSignal(Signal signal) override; // + **2
 };
 
-// 6. Класс паттерна "Абстрактная фабрика"
+// 6. Производный класс для USB сигнала.
+class DemodulatorUSB : public Demodulator {
+public:
+    DemodulatorUSB(int fs) : Demodulator(fs) {};
+
+    std::vector<float> getDemodulatedSignal(Signal signal) override;
+};
+
+// 7. Производный класс для LSB сигнала.
+class DemodulatorLSB : public Demodulator {
+public:
+    DemodulatorLSB(int fs) : Demodulator(fs) {};
+
+    std::vector<float> getDemodulatedSignal(Signal signal) override;
+
+};
+
+// 8. Класс паттерна "Абстрактная фабрика"
 class Factory {
 public:
     int Fs;
@@ -78,6 +98,9 @@ public:
     Demodulator *create(std::string type, int Fs); // Метод создания демодулятора + **3
 
 };
+
+// 9. Класс фильтрации копмлексного сигнала
+//class filter_complex
 
 #endif //DSP_MY_CLASS_DECLARATIONS_H
 
