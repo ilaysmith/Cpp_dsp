@@ -8,7 +8,7 @@ find_package(GTest REQUIRED)
 find_package(Eigen3 REQUIRED)
 
 #
-#enable_testing()
+enable_testing()
 
 include_directories(dsp_my)
 
@@ -28,22 +28,29 @@ add_executable(dsp_my
         dsp_my/Class_declarations.h
         dsp_my/FileManager.cpp
         dsp_my/load_wav_and_iqw.cpp
+        dsp_my/shift_USB.cpp
+        dsp_my/shift_LSB.cpp
 )
 
-#
-add_executable(test
+# Создать
+add_executable(test_demodulator dsp_my/tests.cpp
         dsp_my/load_wav_and_iqw.cpp
         dsp_my/load_wav_and_iqw.cpp
+        dsp_my/demodulator.cpp
+        dsp_my/filter.cpp
+        dsp_my/shift_USB.cpp
+        dsp_my/shift_LSB.cpp
+        dsp_my/Complex.h
 
 )
 
-#
-target_link_libraries(test
+# Подключить (Линковка с GoogleTest)
+target_link_libraries(test_demodulator
         GTest::gtest
         GTest::gtest_main
         pthread
 )
 
-# �
+# Обнаружить
 include(GoogleTest)
-gtest_discover_tests(test)
+gtest_discover_tests(test_demodulator)

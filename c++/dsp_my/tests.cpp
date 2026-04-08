@@ -37,15 +37,20 @@ TEST(test_demodulator, AM) {
 
     // Вызов тестируемой функции
     Factory factory;
-    Demodulator *demod = factory.create("AM", Fs);
+    std::unique_ptr<Demodulator> demod = factory.create_u("AM", Fs);
+    //Demodulator *demod = factory.create("AM", Fs);
     std::vector<float> actual = demod->getDemodulatedSignal(input); // Вызовется DemodulatorAM::getDemodulatedSignal
 
     // Проверка результата
-    EXPECT_EQ(actual, expected);
+    for (size_t n = 0; n < actual.size(); n++) {
+        ASSERT_FLOAT_EQ(actual[n], expected[n]) << "Ошибка в элементе" << n;
+    }
+
+    //EXPECT_EQ(actual, expected);
 }
 
 
-TEST(test_demodulator, FM) {
+TEST(test_demodulator, fmm) {
     // Подготовка тестовых данных
     int Fs = 24000; // Из названия
     Signal input;
@@ -71,16 +76,26 @@ TEST(test_demodulator, FM) {
             };
 
 
-    std::vector<float> expected = {0.381096691, 0.37468496, -0.439901918, 0.219663501,
-                                   0.512223542, 0.907382488, -0.288283139, -0.237578899};
+    // Биты после всех этапов обработки (нормировка)
+    std::vector<float> expected_full = {0.381096691, 0.37468496, -0.439901918, 0.219663501,
+                                        0.512223542, 0.907382488, -0.288283139, -0.237578899};
+
+    // Биты после модуляции
+    std::vector<float> expected = {1.19724080926368, 1.17709798509358, -1.38198145291791, 0.690087668106948,
+                                   1.60918467745096, 2.85060298868780, -0.905660915388651, -0.746370086717512,
+                                   -1.08644830345947, 1.34758450050080, 0.757276055225081, -1.28993292780322,
+                                   0.0348591223755038, -0.0396586801794556, 1.05853503291978, 0};
 
     // Вызов тестируемой функции
     Factory factory;
-    Demodulator *demod = factory.create("FM", Fs);
-    std::vector<float> actual = demod->getDemodulatedSignal(input); // Вызовется DemodulatorAM::getDemodulatedSignal
+    std::unique_ptr<Demodulator> demod = factory.create_u("FM", Fs);
+    std::vector<float> actual = demod->getDemodulatedSignal(input); // Вызовется DemodulatorFM::getDemodulatedSignal
 
     // Проверка результата
-    EXPECT_EQ(actual, expected);
+    //EXPECT_EQ(actual, expected);
+    for (size_t n = 0; n < actual.size(); n++) {
+        ASSERT_FLOAT_EQ(actual[n], expected[n]) << "Ошибка в элементе" << n;
+    }
 }
 
 
@@ -116,11 +131,14 @@ TEST(test_demodulator, USB) {
 
     // Вызов тестируемой функции
     Factory factory;
-    Demodulator *demod = factory.create("USB", Fs);
+    std::unique_ptr<Demodulator> demod = factory.create_u("USB", Fs);
     std::vector<float> actual = demod->getDemodulatedSignal(input); // Вызовется DemodulatorAM::getDemodulatedSignal
 
 
-    EXPECT_EQ(actual, expected);
+    //EXPECT_EQ(actual, expected);
+    for (size_t n = 0; n < actual.size(); n++) {
+        ASSERT_FLOAT_EQ(actual[n], expected[n]) << "Ошибка в элементе" << n;
+    }
 }
 
 TEST(test_demodulator, LSB) {
@@ -155,14 +173,56 @@ TEST(test_demodulator, LSB) {
 
     // Вызов тестируемой функции
     Factory factory;
-    Demodulator *demod = factory.create("LSB", Fs);
+    std::unique_ptr<Demodulator> demod = factory.create_u("LSB", Fs);
     std::vector<float> actual = demod->getDemodulatedSignal(input); // Вызовется DemodulatorAM::getDemodulatedSignal
 
 
-    EXPECT_EQ(actual, expected);
+    //EXPECT_EQ(actual, expected);
+    for (size_t n = 0; n < actual.size(); n++) {
+        ASSERT_FLOAT_EQ(actual[n], expected[n]) << "Ошибка в элементе" << n;
+    }
 }
 
+TEST(test_demodulator, FM) {
+    // Подготовка тестовых данных
+    int Fs = 24000; // Из названия
+    Signal input;
+    input.signal =
+            {
+                    {-609,  -1085},
+                    {4322,  -5282},
+                    {745,   224},
+                    {732,   -1403},
+                    {4747,  -2006},
+                    {513,   1357},
+                    {-803,  -1051},
+                    {-5506, -70},
+                    {-2163, 1950},
+                    {304,   1194},
+                    {-3635, 1858},
+                    {-3676, -1076},
+                    {-259,  408},
+                    {-4309, 6292},
+                    {-1829, 2912},
+                    {-2243, -109}
+                    //
+            };
 
+
+    std::vector<float> expected = {0.381096691, 0.37468496, -0.439901918, 0.219663501,
+                                   0.512223542, 0.907382488, -0.288283139, -0.237578899};
+
+    // Вызов тестируемой функции
+    Factory factory;
+    std::unique_ptr<Demodulator> demod = factory.create_u("FM", Fs);
+    std::vector<float> actual = demod->getDemodulatedSignal(input); // Вызовется DemodulatorFM::getDemodulatedSignal
+
+    // Проверка результата
+    //EXPECT_EQ(actual, expected);
+    for (size_t n = 0; n < actual.size(); n++) {
+        ASSERT_FLOAT_EQ(actual[n], expected[n]) << "Ошибка в элементе" << n;
+    }
+}
 // Ожидаемый результат
 /*
 Signal expected;
@@ -187,3 +247,8 @@ expected.signal =
                 //
         };
 */
+
+// EXPECT - сравнивает и в случае ошибки продолжает
+// ASSERT - в случае ошибки останавливает
+// EXPECT_EQ - может сравнивать вектора
+// EXPECT_FLOAT_EQ - не может, нужно пробегать вручную

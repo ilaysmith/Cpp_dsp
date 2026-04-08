@@ -10,6 +10,7 @@
 #include "any_function.h"
 #include "Complex.h"
 #include "Demodulator.h"
+#include <memory>
 
 
 // 1. Файловый Менеджер
@@ -45,6 +46,9 @@ public:
 // 3. Демодулятор. Абстрактный класс
 class Demodulator {
 public:
+
+    Demodulator() = default;
+
     int Fs;
 
     Demodulator(int fs) : Fs(fs) {};
@@ -68,6 +72,7 @@ public:
 // 5. Производный класс для FM сигнала.
 class DemodulatorFM : public Demodulator {
 public:
+
     DemodulatorFM(int fs) : Demodulator(fs) {};
 
     std::vector<float> getDemodulatedSignal(Signal signal) override; // + **2
@@ -76,18 +81,35 @@ public:
 // 6. Производный класс для USB сигнала.
 class DemodulatorUSB : public Demodulator {
 public:
+
+    DemodulatorUSB() = default;
+
+    size_t currentSampleIndex;
+
+    double currentTime;         // Текущее время в секундах
+
     DemodulatorUSB(int fs) : Demodulator(fs) {};
 
     std::vector<float> getDemodulatedSignal(Signal signal) override;
+
+    Signal shift_USB(Signal signal); // Функция сдвига сигнала
 };
 
 // 7. Производный класс для LSB сигнала.
 class DemodulatorLSB : public Demodulator {
 public:
+
+    DemodulatorLSB() = default;
+
+    size_t currentSampleIndex; // Текущий отсчёт
+
+    double currentTime;         // Текущее время в секундах
+
     DemodulatorLSB(int fs) : Demodulator(fs) {};
 
     std::vector<float> getDemodulatedSignal(Signal signal) override;
 
+    Signal shift_LSB(Signal signal); // Функция сдвига сигнала
 };
 
 // 8. Класс паттерна "Абстрактная фабрика"
@@ -95,7 +117,8 @@ class Factory {
 public:
     int Fs;
 
-    Demodulator *create(std::string type, int Fs); // Метод создания демодулятора + **3
+    std::unique_ptr<Demodulator> create_u(std::string type, int Fs); // Возвращает указатель с владением
+    //Demodulator *create(std::string type, int Fs); // Метод создания демодулятора + **3
 
 };
 

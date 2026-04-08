@@ -23,4 +23,6 @@ void save_wav_and_iqw(const std::vector<float> &saveSignal, AudioFile<float> aud
 
 void save_bin_and_data(const std::vector<float> &signal, const std::string &filename);
 
+//Signal shiftedSignal(Signal signal);
+
 #endif //DSP_MY_ANY_FUNCTION_H

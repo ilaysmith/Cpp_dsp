@@ -1,6 +1,8 @@
 clear all; close all; clc;
 %% Чтение файла
-fid = fopen('/home/morda/task_for_stc_1/dsp_my/dsp_my/FM3E_fs_24000_float_12_16_56.bin');
+fid = fopen('/home/morda/task_for_stc_1/Cpp_dsp/sound/FM3E_fs_24000_float_12_16_56.bin');
+% /home/morda/task_for_stc_1/Cpp_dsp/sound/FM3E_fs_24000_float_12_16_56.bin
+%  /home/morda/task_for_stc_1/dsp_my/dsp_my/FM3E_fs_24000_float_12_16_56.bin
 y = fread(fid,inf,"single");
 fclose(fid);
 Fs = 24000;

@@ -49,149 +49,97 @@ std::vector<float> DemodulatorFM::getDemodulatedSignal(Signal signal) {
         audio[i] = (signal.signal[i].conjugate() * signal.signal[i + 1]).phase();
     }
 
-    // Проход по значениям
-    for (size_t i; i < audio.size(); i++) {
-        if (audio[i] > M_PI) {
-            audio[i] = audio[i] - 2 * M_PI;
-        }
-        if (audio[i] < -M_PI) {
-            audio[i] = audio[i] + 2 * M_PI;
-        }
-    }
-
-    // Нормировка
-    float max = *std::max_element(audio.begin(), audio.end());
-    for (size_t i = 0; i < audio.size(); i++) {
-        audio[i] = audio[i] / max;
-    }
     return audio;
 };
 
 // 3. Демодулятор USB: Q компоненты комплексной огибающей + перенос + фильтрация + нормировка
-std::vector<float> DemodulatorUSB::getDemodulatedSignal(Signal signal) {
+std::vector<float> DemodulatorUSB::getDemodulatedSignal(Signal signal) {         // complex
 
     // Сдвиг
-    int shift = 1000; // Гц
-    std::vector<float> result;
-    result.resize(signal.signal.size() * 2);
+    shift_USB(signal);
+
+    // Берём одну составляющую
+    std::vector<float> valid_signal;
+    valid_signal.resize(signal.signal.size() * 2);
 
     for (size_t i = 0; i < signal.signal.size(); i++) {
-        signal.signal[i].set_real(0);
-    }
-
-    // Вектор времени
-    double Ts = 1.0 / signal.fs; // Период дискретизации
-    for (size_t i = 0; i < signal.signal.size(); i++) { // i - отсчёт
-        double t = i * Ts; // время, прошедшее с начала до i-го отчёта
-
-        // Комплексная экспонента + **3
-        float angle = (2.0 * M_PI * shift * t);
-        // Формула Эйлера
-        Complex<float> eiler(std::cos(angle), std::sin(angle));
-        // Смещённый сигнал
-        Complex<float> shifted_bits = (signal.signal[i] * eiler);
-        signal.signal[i] = shifted_bits;
-
-        //result[2 * i] = shifted_bits.get_real();
-        //result[2 * i + 1] = shifted_bits.get_imag();
-
+        valid_signal[i] = signal.signal[i].get_imag();
     }
 
     // Фильтрация
     filter Filter;
-    Filter.delete_const_complex(signal);
+    Filter.delete_const(valid_signal);
 
 
-    // Нормировка. Найдём максимальное значение по модулю
-    float max_mag = 0.0f;
-    for (size_t i = 0; i < signal.signal.size(); i++) {
-        float mag = signal.signal[i].magnitude();
-        if (mag > max_mag) {
-            max_mag = mag;
-        }
+    // Нормировка
+    size_t max = *std::max_element(valid_signal.begin(), valid_signal.end()); // Даёт указатель на максимальный элемент
+    for (size_t i = 0; i < valid_signal.size(); i++) {
+        valid_signal[i] = valid_signal[i] / max;
     }
 
-    for (size_t i = 0; i < signal.signal.size(); i++) {
-        signal.signal[i] = signal.signal[i] * (1 / max_mag);
-    }
-    // Переход к вектору
-    for (size_t i = 0; i < signal.signal.size(); i++) {
-        result[2 * i] = signal.signal[i].get_real();
-        result[2 * i + 1] = signal.signal[i].get_imag();
-    }
+    // Обновляем состояние после обработки
+    currentSampleIndex += valid_signal.size();
+    currentTime = currentSampleIndex * (1.0 / Fs);
 
-    return result;
+    return valid_signal;
 }
 
 // 4. Демодулятор SSB: I компоненты комплексной огибающей + перенос + фильтрация + нормировка
 std::vector<float> DemodulatorLSB::getDemodulatedSignal(Signal signal) {
 
     // Сдвиг
-    int shift = 1000; // Гц
-    std::vector<float> result;
-    result.resize(signal.signal.size() * 2);
+    shift_LSB(signal);
 
+    // Берём составляющую
+    std::vector<float> valid_signal;
+    valid_signal.resize(signal.signal.size() * 2);
     for (size_t i = 0; i < signal.signal.size(); i++) {
-        signal.signal[i].set_real(0);
-    }
-
-    // Вектор времени
-    double Ts = 1.0 / signal.fs; // Период дискретизации
-    for (size_t i = 0; i < signal.signal.size(); i++) { // i - отсчёт
-        double t = i * Ts; // время, прошедшее с начала до i-го отчёта
-
-        // Комплексная экспонента + **3
-        float angle = (2.0 * M_PI * shift * t);
-        // Формула Эйлера
-        Complex<float> eiler(std::cos(angle), std::sin(angle));
-        // Смещённый сигнал
-        Complex<float> shifted_bits = (signal.signal[i] * eiler);
-        signal.signal[i] = shifted_bits;
-
-        //result[2 * i] = shifted_bits.get_real();
-        //result[2 * i + 1] = shifted_bits.get_imag();
-
+        valid_signal[i] = signal.signal[i].get_imag();
     }
 
     // Фильтрация
     filter Filter;
-    Filter.delete_const_complex(signal);
+    Filter.delete_const(valid_signal); // действительный сигнал
 
-
-    // Нормировка. Найдём максимальное значение по модулю
-    float max_mag = 0.0f;
-    for (size_t i = 0; i < signal.signal.size(); i++) {
-        float mag = signal.signal[i].magnitude();
-        if (mag > max_mag) {
-            max_mag = mag;
-        }
+    // Нормировка
+    size_t max = *std::max_element(valid_signal.begin(), valid_signal.end()); // Даёт указатель на максимальный элемент
+    for (size_t i = 0; i < valid_signal.size(); i++) {
+        valid_signal[i] = valid_signal[i] / max;
     }
 
-    for (size_t i = 0; i < signal.signal.size(); i++) {
-        signal.signal[i] = signal.signal[i] * (1 / max_mag);
-    }
-    // Переход к вектору
-    for (size_t i = 0; i < signal.signal.size(); i++) {
-        result[2 * i] = signal.signal[i].get_real();
-        result[2 * i + 1] = signal.signal[i].get_imag();
-    }
+    // Обновляем состояние после обработки. Если сигнал был не полностью обработан, то здесь это будет учтено и использовано при следующем запуске
+    currentSampleIndex += valid_signal.size();
+    currentTime = currentSampleIndex * (1.0 / Fs);
 
-    return result;
+    return valid_signal;
 }
 
 // 5. Фабрика
-Demodulator *Factory::create(std::string type, int Fs) { // Возвращаем указатель
+std::unique_ptr<Demodulator> Factory::create_u(std::string type, int Fs) {
     if (type == "AM") {
-        return new DemodulatorAM(Fs);        // Возвращаем указатель
+        return std::make_unique<DemodulatorAM>(Fs); // Возвращаем указатель
     } else if (type == "FM") {
-        return new DemodulatorFM(Fs);       // Возвращаем указатель
+        return std::make_unique<DemodulatorFM>(Fs); // Возвращаем указатель
     } else if (type == "USB") {
-        return new DemodulatorUSB(Fs);
+        return std::make_unique<DemodulatorUSB>(Fs); // Возвращаем указатель
     } else if (type == "LSB") {
-        return new DemodulatorLSB(Fs);
+        return std::make_unique<DemodulatorLSB>(Fs); // Возвращаем указатель
     }
     return nullptr;
 }
+
+//Demodulator *Factory::create(std::string type, int Fs) { // Возвращаем указатель
+//    if (type == "AM") {
+//       return new DemodulatorAM(Fs);        // Возвращаем указатель
+// } else if (type == "FM") {
+//   return new DemodulatorFM(Fs);       // Возвращаем указатель
+//  } else if (type == "USB") {
+//     return new DemodulatorUSB(Fs);
+// } else if (type == "LSB") {
+//    return new DemodulatorLSB(Fs);
+//}
+//return nullptr;
+//}
 
 //          ДОПОЛНИТЕЛЬНЫЕ КОММЕНТАРИИ
 // **1 - Использовал вместо resize (Выделяет память и заполняет нулями) метод reserve (просто резервирует память).
@@ -204,3 +152,15 @@ Demodulator *Factory::create(std::string type, int Fs) { // Возвращаем
 //       Нужно разложить по формуле Эйлера.
 //       Либо можно использовать перегрузку std::exp() в std::complex, но у меня используется свой Complex.h.
 //       И в нём такого нет.
+
+
+// Нормировка для комплексного сигнала
+/*
+float max_mag = 0.0f;
+for (size_t i = 0; i < signal.signal.size(); i++) {
+float mag = signal.signal[i].magnitude();
+if (mag > max_mag) {
+max_mag = mag;
+}
+}
+ */
